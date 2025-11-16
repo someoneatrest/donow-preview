@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+<title>DoNow — Mobile Preview</title>
+<style>
+  :root{--bg:#f8fafc;--card:#fff;--muted:#6b7280;--accent:#0f172a;--green:#10b981;}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;background:linear-gradient(180deg,#f8fafc,#ffffff);-webkit-font-smoothing:antialiased;color:var(--accent);-webkit-text-size-adjust:none;min-height:100vh;}
+  .viewport{max-width:420px;margin:18px auto;padding:18px;}
+  .card{background:var(--card);border-radius:18px;box-shadow:0 8px 30px rgba(15,23,42,0.06);padding:18px;}
+  h1{margin:0;font-size:20px;}
+  h2{margin:0;font-size:16px;}
+  p{margin:6px 0;color:var(--muted);font-size:13px;}
+  .btn{display:inline-block;padding:12px 14px;border-radius:12px;font-weight:600;text-align:center;cursor:pointer;border:none;}
+  .btn-primary{display:inline-block;padding:12px 14px;border-radius:12px;font-weight:600;text-align:center;cursor:pointer;background:#0b84ff;color:white;}
+  .btn-outline{background:transparent;border:1px solid #e6e9ef;color:var(--accent);}
+  .grid{display:grid;gap:10px;}
+  .goal{padding:12px;border-radius:12px;border:1px solid #eef2f7;text-align:left;cursor:pointer;}
+  .muted{color:var(--muted);font-size:12px;}
+  .center{text-align:center;}
+  .small{font-size:12px;}
+  .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2f7;font-size:12px;}
+  .points{font-weight:700;}
+  .footer{font-size:12px;color:var(--muted);text-align:center;margin-top:10px;}
+  /* mobile feeling */
+  .screen{min-height:380px;display:flex;flex-direction:column;justify-content:space-between;}
+  .actions-row{display:flex;gap:8px;}
+  .lock-list{background:#fbfdff;border-radius:10px;padding:10px;border:1px dashed #e6eef8;font-size:13px;}
+  .reward-item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;border:1px solid #f0f4f8;}
+  /* small animations */
+  .fade{transition:all .22s ease;opacity:1;}
+  .hidden{opacity:0;transform:translateY(6px);pointer-events:none;height:0;}
+</style>
+</head>
+<body>
+<div class="viewport">
+  <div class="card screen" id="screen-welcome">
+    <div>
+      <header style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h1>DoNow</h1>
+        <div style="text-align:right;">
+          <div class="small muted">Streak</div>
+          <div style="font-weight:700;">3 🔥</div>
+        </div>
+      </header>
+
+      <main>
+        <h2>Change your life 2 minutes at a time</h2>
+        <p>Pick one goal. Do one tiny action. Lock distractions. Build momentum.</p>
+
+        <div class="grid" style="margin-top:12px;">
+          <button class="btn btn-primary" onclick="showScreen('choose')">Get started — pick a goal</button>
+          <button class="btn btn-outline" onclick="showScreen('how')">How it works</button>
+        </div>
+      </main>
+    </div>
+
+    <div class="footer">MVP preview • DoNow — Micro-Commitment Action Coach</div>
+  </div>
+
+  <div class="card screen hidden" id="screen-choose">
+    <div>
+      <h2>Choose a single goal</h2>
+      <p class="muted">Pick only one. Focus increases success.</p>
+
+      <div class="grid" style="margin-top:10px;">
+        <div class="goal" onclick="selectGoal('Fitness — start gym')">
+          <div style="font-weight:600">Fitness — start gym</div>
+          <div class="muted">Micro-actions under 2 minutes</div>
+        </div>
+        <div class="goal" onclick="selectGoal('Study — exam prep')">
+          <div style="font-weight:600">Study — exam prep</div>
+          <div class="muted">Micro-actions under 2 minutes</div>
+        </div>
+        <div class="goal" onclick="selectGoal('Side hustle — idea & outreach')">
+          <div style="font-weight:600">Side hustle — idea & outreach</div>
+          <div class="muted">Micro-actions under 2 minutes</div>
+        </div>
+        <div class="goal" onclick="selectGoal('Morning routine — wake up earlier')">
+          <div style="font-weight:600">Morning routine — wake up earlier</div>
+          <div class="muted">Micro-actions under 2 minutes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions-row" style="justify-content:space-between;">
+      <button class="btn btn-outline" onclick="showScreen('welcome')">Back</button>
+      <button class="btn btn-primary" onclick="showScreen('custom')">Create Custom Goal</button>
+    </div>
+  </div>
+
+  <div class="card screen hidden" id="screen-confirm">
+    <div>
+      <h2 id="confirm-title">Ready for small action?</h2>
+      <p class="muted">Goal: <span id="confirm-goal" style="font-weight:600">—</span></p>
+
+      <div style="margin-top:8px;padding:12px;border-radius:12px;background:#fbfdff;border:1px solid #eef6ff;">
+        <div class="small">Suggested micro-action</div>
+        <div id="micro-text" style="font-weight:700;margin-top:6px;">Do one tiny step</div>
+        <div class="muted small" id="micro-time" style="margin-top:6px;">Estimated time: 2 min</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-outline" onclick="showScreen('choose')">Change goal</button>
+      <button class="btn btn-primary" onclick="startAction()">Start action</button>
+    </div>
+  </div>
+
+  <div class="card screen hidden" id="screen-action">
+    <div class="center">
+      <h2>Complete this micro-action</h2>
+      <p class="muted" id="action-text">—</p>
+      <div style="margin-top:12px;"><span class="pill">⏱ 2 min</span></div>
+
+      <div style="margin-top:18px;" class="actions-row center">
+        <button class="btn btn-outline" onclick="showScreen('lock')">Lock & Start</button>
+        <button class="btn btn-primary" onclick="finishAction()">I finished</button>
+      </div>
+
+      <div class="muted small" style="margin-top:10px;">(In the real app: open accessibility lock to prevent distractions)</div>
+    </div>
+
+    <div class="footer muted small">Tip: do the small action right now — it should take under 2 minutes.</div>
+  </div>
+
+  <div class="card screen hidden" id="screen-lock">
+    <div>
+      <h2>Locking distractions</h2>
+      <p class="muted">DoNow will block selected distraction apps until you complete the micro-action.</p>
+
+      <div class="lock-list" style="margin-top:8px;">
+        <div>• Instagram</div>
+        <div>• YouTube</div>
+        <div>• Games</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-outline" onclick="showScreen('action')">Cancel</button>
+      <button class="btn btn-primary" onclick="finishAction()">I finished</button>
+    </div>
+  </div>
+
+  <div class="card screen hidden" id="screen-result">
+    <div class="center">
+      <h2>Nice — you did it!</h2>
+      <p class="muted">+10 points • streak continues</p>
+
+      <div style="margin-top:10px;padding:12px;border-radius:12px;background:#fbfdff;border:1px solid #eef6ff;">
+        <div>Points: <span class="points" id="points">120</span></div>
+        <div>Streak: <span id="streak">4</span> days</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-outline" onclick="showScreen('choose')">Do another</button>
+      <button class="btn btn-primary" onclick="showScreen('rewards')">Redeem rewards</button>
+    </div>
+  </div>
+
+  <div class="card screen hidden" id="screen-rewards">
+    <div>
+      <h2>Rewards</h2>
+      <p class="muted">Spend points to unlock coupons & discounts</p>
+
+      <div class="grid" style="margin-top:8px;">
+        <div class="reward-item">
+          <div>
+            <div style="font-weight:600">₹50 off — Fitness brand</div>
+            <div class="muted small">Cost: 100 points</div>
+          </div>
+          <button class="btn btn-primary small" onclick="redeem(100)">Redeem</button>
+        </div>
+
+        <div class="reward-item">
+          <div>
+            <div style="font-weight:600">1 month — Premium Coach</div>
+            <div class="muted small">Cost: 500 points</div>
+          </div>
+          <button class="btn btn-primary small" onclick="redeem(500)">Redeem</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;margin-top:12px;">
+      <button class="btn btn-outline" onclick="showScreen('result')">Back</button>
+      <button class="btn btn-primary" onclick="startNew()">Start new goal</button>
+    </div>
+  </div>
+
+  <div class="card screen hidden" id="screen-how">
+    <div>
+      <h2>How DoNow works</h2>
+      <ol style="padding-left:18px;color:var(--muted);font-size:13px;">
+        <li>Pick one goal — single focus.</li>
+        <li>Get micro-actions that take &lt; 2 minutes.</li>
+        <li>Lock distractions using Android Accessibility APIs (Android only).</li>
+        <li>Complete actions and earn points.</li>
+        <li>Redeem real rewards to keep momentum.</li>
+      </ol>
+    </div>
+    <div style="display:flex;justify-content:flex-end;">
+      <button class="btn btn-primary" onclick="showScreen('choose')">Start now</button>
+    </div>
+  </div>
+
+  <div class="card screen hidden" id="screen-custom">
+    <div>
+      <h2>Create a custom goal</h2>
+      <p class="muted">Type your goal and we'll make tiny actions for it.</p>
+      <input id="custom-input" placeholder="e.g., Learn guitar" style="width:100%;padding:10px;border-radius:10px;border:1px solid #eef2f7;margin-top:8px;font-size:14px;" />
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-outline" onclick="showScreen('choose')">Cancel</button>
+      <button class="btn btn-primary" onclick="createCustom()">Create</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let state = { goal: null, points: 120, streak: 3 };
+  function showScreen(id) {
+    const screens = document.querySelectorAll('.card.screen');
+    screens.forEach(s => s.classList.add('hidden'));
+    document.getElementById('screen-' + id).classList.remove('hidden');
+    window.scrollTo(0,0);
+  }
+  function selectGoal(g){ state.goal = g; document.getElementById('confirm-goal').innerText = g; document.getElementById('micro-text').innerText = 'Do one tiny step for: '+g; document.getElementById('micro-time').innerText = 'Estimated time: 2 min'; showScreen('confirm'); }
+  function startAction(){ document.getElementById('action-text').innerText = document.getElementById('micro-text').innerText; showScreen('action'); }
+  function finishAction(){ state.points += 10; state.streak += 1; document.getElementById('points').innerText = state.points; document.getElementById('streak').innerText = state.streak; showScreen('result'); }
+  function redeem(cost){ if(state.points >= cost){ state.points -= cost; document.getElementById('points').innerText = state.points; alert('Redeemed! Check your email for coupon (demo).'); } else { alert('Not enough points yet.'); } }
+  function startNew(){ state.goal = null; showScreen('choose'); }
+  function createCustom(){ const val = document.getElementById('custom-input').value.trim(); if(!val){ alert('Type a goal name'); return;} selectGoal(val); }
+  // initial
+  showScreen('welcome');
+</script>
+</body>
+</html>
